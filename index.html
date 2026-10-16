@@ -168,6 +168,21 @@ h2.title{margin:0 0 6px;font-size:1.35rem;font-weight:700}
 .feedback-item{background:#fff;padding:10px 14px;border-left:5px solid;margin-bottom:10px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);font-size:.88rem}
 .feedback-item.benar{border-color:var(--ok)}
 .feedback-item.salah{border-color:var(--bad)}
+.topik-tag{display:inline-block;margin:6px 0 2px;padding:2px 10px;border-radius:999px;background:#eef2ff;color:#4338ca;font-size:.7rem;font-weight:700}
+.jwb-siswa{color:#b91c1c;margin-top:4px}
+.jwb-benar{color:#047857;margin-top:2px}
+.penjelasan{margin-top:8px;padding:8px 12px;background:#fffbeb;border-radius:8px;color:#78350f;font-size:.84rem;line-height:1.5}
+.motivasi{background:linear-gradient(135deg,#eef2ff,#faf5ff);border:2px solid #c7d2fe;border-radius:20px;padding:20px 18px;margin-bottom:20px}
+.motivasi.curang{background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fdba74}
+.motivasi h3{margin:0 0 8px;color:#3730a3}
+.motivasi.curang h3{color:#9a3412}
+.motivasi p{margin:6px 0;font-size:.9rem;line-height:1.6}
+.mot-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.mot-col{background:#fff;border-radius:14px;padding:12px 14px;font-size:.84rem;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.mot-col b{display:block;margin-bottom:6px}
+.mot-col ul{margin:0;padding-left:18px}
+.mot-quote{text-align:center;font-weight:700;color:#4338ca;margin-top:12px!important}
+@media (max-width:600px){.mot-grid{grid-template-columns:1fr}}
 
 /* ---------- KAMERA & MODAL ---------- */
 #floating-cam{position:fixed;bottom:16px;right:16px;width:118px;height:88px;background:#000;border:3px solid var(--p);border-radius:14px;z-index:900;display:none;transform:scaleX(-1);object-fit:cover;box-shadow:0 8px 24px rgba(0,0,0,.3)}
@@ -419,7 +434,8 @@ body.shield .container *{pointer-events:none}
           <div id="rapor-status" style="font-weight:700"></div>
           <div class="meta" id="rapor-meta"></div>
         </div>
-        <h3>Koreksi & Feedback Jawaban</h3>
+        <div id="motivasi-box"></div>
+        <h3>Koreksi, Feedback & Penjelasan Jawaban</h3>
         <div id="feedback-container"></div>
         <button class="btn no-print" onclick="window.print()">🖨️ Simpan PDF / Cetak Rapor</button>
       </div>
@@ -486,31 +502,31 @@ const kuisC = [
 ];
 
 const formatifData = [
-  {q:"Sebuah perusahaan teknologi merilis AI penilai lamaran kerja. Setelah 1 bulan, terungkap bahwa AI tersebut otomatis menolak pelamar perempuan. Berdasarkan prinsip AI, penyebab utama masalah ini adalah...", o:["Komputer terserang virus sebelum proses seleksi","AI dilatih menggunakan data (dataset) masa lalu yang didominasi oleh pelamar laki-laki","AI memiliki perasaan benci terhadap manusia","Internet perusahaan tidak stabil saat AI bekerja"], a:1},
-  {q:"Budi menerima video dari aplikasi pesan yang menampilkan kepala sekolahnya sedang berbicara dengan kata-kata kasar. Budi curiga itu adalah hasil Deepfake. Langkah analisis kritis pertama yang paling logis dilakukan Budi adalah...", o:["Langsung membagikan video itu ke teman kelas untuk diskusi","Memperhatikan sinkronisasi gerak bibir dan kedipan mata tokoh di video tersebut","Mempercayai video tersebut 100% karena resolusinya HD","Melaporkan kepala sekolah ke polisi"], a:1},
-  {q:"Sinta meminta ChatGPT untuk menuliskan rekam jejak kakeknya yang bukan tokoh terkenal. AI tersebut memberikan jawaban yang sangat panjang, dramatis, namun kejadiannya tidak pernah kakek Sinta alami. Fenomena ini dalam Kecerdasan Artifisial disebut...", o:["Voice Cloning","AI Hallucination (Halusinasi AI)","Cyber Security Breach","Garbage In, Garbage Out"], a:1},
-  {q:"Seorang siswa memasukkan nama lengkap, alamat rumah, nomor KTP orang tua, dan lokasi sekolah ke dalam Chatbot publik untuk dibuatkan surat izin sakit otomatis. Risiko keamanan terbesar dari tindakan siswa tersebut adalah...", o:["Chatbot akan rusak karena teks terlalu panjang","Data pribadi berpotensi tersimpan di peladen (server) AI dan bisa bocor / disalahgunakan","Siswa akan otomatis dikeluarkan dari sekolah","Kuota internet siswa akan terkuras habis"], a:1},
-  {q:"Dalam sistem penginderaan AI pada mobil otonom (bisa menyetir sendiri), kamera pada mobil merekam rambu lalu lintas. Bagaimana komputer pada mobil tersebut 'memaknai' gambar rambu merah itu?", o:["Sistem merasakannya sebagai cahaya panas","Sistem mengubah piksel gambar menjadi matriks angka matematis lalu mencocokkannya dengan pola data latih","Sistem melihat rambu lalu langsung menelepon polisi","Sistem akan menutup mata karena warnanya merah"], a:1},
-  {q:"Prinsip 'Garbage In, Garbage Out' (GIGO) dalam AI memberikan pesan penting bagi programmer bahwa...", o:["Programmer harus rajin mengosongkan folder tempat sampah di komputer","Kecerdasan AI 100% bergantung pada akurasi dan objektivitas data yang diajarkan","AI tidak membutuhkan campur tangan manusia setelah diciptakan","Sebuah AI tidak bisa rusak meskipun datanya penuh virus"], a:1},
-  {q:"Pak Irwan menggunakan AI untuk menghasilkan gambar rapat dewan guru. Namun saat diperbesar, ada guru yang memiliki 7 jari tangan. Kesimpulan apa yang bisa diambil dari temuan artefak ini?", o:["AI tersebut meramalkan mutasi genetik di masa depan","Generative AI sering gagal memahami proporsi tubuh fisik manusia secara logis","Itu adalah foto asli, namun kameranya buram","Sistem komputer Pak Irwan terkena malware"], a:1},
-  {q:"Seseorang menelepon ibu Rina menggunakan nomor tidak dikenal. Suara di telepon itu sangat mirip 100% dengan suara anak Rina yang sedang menangis minta ditransfer uang. Jika Rina melek literasi AI, ia akan menyadari bahwa ini kemungkinan adalah serangan...", o:["Phishing email biasa","Voice Cloning menggunakan Kecerdasan Artifisial","Penipuan kartu kredit manual","Deepfake Video"], a:1},
-  {q:"Mengapa kita TIDAK BOLEH mempercayakan pengambilan keputusan mutlak terkait hidup manusia (seperti vonis hukum di pengadilan) hanya kepada Kecerdasan Artifisial?", o:["Karena AI tidak punya empati dan mungkin menghasilkan putusan bias akibat data latihnya","Karena biaya listrik untuk menjalankan AI terlalu mahal bagi negara","Karena AI akan menghabiskan kertas putusan pengadilan","Karena AI lambat dalam mengetik surat keputusan"], a:0},
-  {q:"Jika Anda ingin melatih sebuah AI untuk mendeteksi penyakit kulit secara adil pada semua ras manusia, jenis data latih (dataset) yang HARUS Anda kumpulkan adalah...", o:["Hanya foto penyakit dari rumah sakit di Eropa (orang kulit putih)","Foto-foto beresolusi rendah agar cepat diproses","Kumpulan foto penyakit kulit dari beragam ras, warna kulit, usia, dan jenis kelamin","Hanya teks teori medis dari buku kedokteran"], a:2},
-  {q:"Sistem pengenal wajah (Face Recognition) di pintu masuk MTsN 6 bertindak sebagai alat yang menggabungkan perangkat penginderaan (sensor) dengan AI. Perangkat penginderaan utamanya adalah...", o:["Mikrofon","Kamera (Sensor Optik)","Loudspeaker","Keyboard Mechanical"], a:1},
-  {q:"Saat mengetik kalimat bahasa Indonesia menggunakan Google Assistant lewat suara, AI bertindak mengolah informasi suara menjadi teks (Speech to Text). Sensor utama yang menyuplai data ini bagi AI adalah...", o:["Mikrofon (Sensor Akustik)","Monitor Komputer","Lensa Kamera","Mouse Wireless"], a:0},
-  {q:"Etika penggunaan Kecerdasan Artifisial bagi seorang siswa dalam mengerjakan tugas esai dari guru adalah...", o:["Meminta AI menulis 100% esai dan mengklaimnya sebagai tulisan tangan sendiri","Menggunakan AI hanya sebagai alat bantu brainstorming ide, lalu menulis ulang dengan bahasa dan pemahaman sendiri","Menyuruh AI meretas komputer guru untuk memberikan nilai 100","Tidak menggunakan AI sama sekali agar tidak dimarahi komputer"], a:1},
-  {q:"Andi mengunduh gambar pendaratan manusia di Mars hasil buatan Midjourney (AI Art). Ia mempublikasikannya di blognya dengan judul 'Foto Asli Mars dari NASA'. Tindakan Andi tersebut menunjukkan sikap...", o:["Kritis dan inovatif","Melanggar etika karena menyebarkan disinformasi (hoaks) menggunakan artefak AI","Hebat karena bisa menggunakan teknologi canggih","Sangat peduli pada pengetahuan luar angkasa"], a:1},
-  {q:"Manakah dari aktivitas berikut yang merupakan dampak positif (manfaat) Kecerdasan Artifisial dalam kehidupan masyarakat?", o:["Mengurangi minat baca buku pelajaran fisik","Menganalisis hasil rontgen paru-paru pasien untuk mendeteksi gejala awal secara cepat","Membuat kloning wajah artis untuk iklan tanpa izin","Menghasilkan esai sekolah secara massal agar siswa tidak perlu berpikir"], a:1},
-  {q:"Fitur 'Auto-Correct' pada keyboard smartphone sering kali salah menebak kata yang ingin kita ketik, khususnya kata gaul/daerah. Hal ini membuktikan bahwa...", o:["Kecerdasan buatan masih sangat mungkin menghasilkan output yang salah / kurang konteks","Smartphone tersebut rusak dan harus dibuang","AI memiliki sifat jahat untuk mengganggu manusia","AI lebih pintar dari bahasa manusia"], a:0},
-  {q:"Algoritma rekomendasi YouTube/TikTok adalah bentuk AI yang belajar dari kebiasaan menonton Anda. Jika Anda hanya sering menonton konten hoaks, maka AI tersebut akan...", o:["Otomatis menyaring konten hoaks karena ia peduli pada Anda","Menyarankan lebih banyak video hoaks serupa karena prinsip datanya bias","Menghapus akun Anda secara otomatis","Meminta izin orang tua Anda terlebih dahulu"], a:1},
-  {q:"Perhatikan pernyataan ini: 'AI Generatif (seperti ChatGPT/Gemini) bukan sekadar mencari data di Google, melainkan menebak kata demi kata berdasarkan probabilitas matematis.'\nDari pernyataan tersebut, dapat disimpulkan bahwa AI Generatif...", o:["Tidak pernah salah dalam memberikan fakta","Bisa menyusun kalimat baru yang luwes, namun bisa saja merangkai kebohongan yang logis","Hanya bisa copy-paste dari Wikipedia","Mampu memahami emosi terdalam manusia"], a:1},
-  {q:"Jika Anda sedang menganalisis keaslian sebuah video pidato tokoh (mencari ciri deepfake), Anda harus memperhatikan anomali (kejanggalan) pada...", o:["Jumlah jempol / like pada video tersebut","Bentuk bayangan wajah (lighting) dan gigi yang tampak blur atau aneh saat berbicara","Resolusi video yang disetel menjadi 1080p","Warna baju yang dipakai audiens di latar belakang"], a:1},
-  {q:"Di sebuah sekolah, sistem AI digunakan untuk mengelompokkan minat bakat siswa. Jika ternyata hasil pengelompokan selalu keliru, tindakan perbaikan paling logis secara teknis adalah...", o:["Mengevaluasi dan memperbaiki KUALITAS DATA nilai dan survei siswa yang dimasukkan sebelumnya ke dalam AI","Menghancurkan komputer tersebut","Mengganti merk komputer","Menambahkan lebih banyak virus ke dalam sistem"], a:0},
-  {q:"Generative AI dapat merugikan seniman visual/pelukis jika...", o:["AI dipakai untuk mewarnai sketsa manual","AI dilatih (di-training) menggunakan miliaran karya seniman dari internet tanpa izin dan hak cipta (copyright)","AI mengajarkan teknik melukis baru","AI menghabiskan banyak listrik saat dinyalakan"], a:1},
-  {q:"Perbedaan utama cara Manusia dan Kecerdasan Artifisial (KA) dalam mengolah informasi adalah...", o:["Manusia menggunakan intuisi, moral, dan akal sehat, sedangkan KA murni mengkalkulasi pola data numerik tanpa emosi","Manusia lebih cepat dalam menghitung jutaan angka daripada KA","KA memiliki hati nurani, manusia tidak","KA tidak membutuhkan listrik untuk mengolah informasi"], a:0},
-  {q:"Mengapa penting bagi siswa kelas IX mempelajari cara mendeteksi 'Analisis Artefak Hasil KA'?", o:["Agar siswa bisa membuat virus komputer mutakhir","Sebagai bekal literasi digital agar kritis dan tidak mudah tertipu hoaks/manipulasi media di internet","Agar bisa mematikan komputer jarak jauh","Agar siswa menjadi robot"], a:1},
-  {q:"Keamanan siber (Cybersecurity) di era AI mengharuskan kita memiliki prinsip 'Zero Trust', yang dalam konteks keseharian berarti...", o:["Tidak mempercayai satupun manusia di bumi","Menghindari segala bentuk investasi uang digital","Selalu bersikap skeptis dan verifikasi setiap informasi/file yang tampak meyakinkan di internet","Tidak menggunakan internet sama sekali"], a:2},
-  {q:"Sikap akhir yang paling tepat mengenai hubungan Manusia dan AI adalah...", o:["Manusia harus tunduk pada keputusan efisien AI","AI adalah ancaman eksistensial yang harus dimusnahkan segera","AI adalah Alat Bantu (Tools); manusia tetap menjadi pemegang kendali dan tanggung jawab penuh","AI dan manusia harus bersaing memperebutkan wilayah geografis bumi"], a:2}
+  {q:"Sebuah perusahaan teknologi merilis AI penilai lamaran kerja. Setelah 1 bulan, terungkap bahwa AI tersebut otomatis menolak pelamar perempuan. Berdasarkan prinsip AI, penyebab utama masalah ini adalah...", o:["Komputer terserang virus sebelum proses seleksi","AI dilatih menggunakan data (dataset) masa lalu yang didominasi oleh pelamar laki-laki","AI memiliki perasaan benci terhadap manusia","Internet perusahaan tidak stabil saat AI bekerja"], a:1, t:"Bias Data & GIGO", e:"AI belajar dari data masa lalu. Karena data pelamar didominasi laki-laki, AI menganggap pola itu 'normal' lalu menolak perempuan. Ini disebut bias data, bukan karena virus, jaringan, atau perasaan benci."},
+  {q:"Budi menerima video dari aplikasi pesan yang menampilkan kepala sekolahnya sedang berbicara dengan kata-kata kasar. Budi curiga itu adalah hasil Deepfake. Langkah analisis kritis pertama yang paling logis dilakukan Budi adalah...", o:["Langsung membagikan video itu ke teman kelas untuk diskusi","Memperhatikan sinkronisasi gerak bibir dan kedipan mata tokoh di video tersebut","Mempercayai video tersebut 100% karena resolusinya HD","Melaporkan kepala sekolah ke polisi"], a:1, t:"Deepfake, Voice Cloning & Artefak KA", e:"Deepfake sering gagal menyamakan gerak bibir dan kedipan mata secara alami. Memeriksa kejanggalan visual adalah langkah verifikasi pertama sebelum menyebarkan video. Resolusi HD tidak membuktikan video itu asli."},
+  {q:"Sinta meminta ChatGPT untuk menuliskan rekam jejak kakeknya yang bukan tokoh terkenal. AI tersebut memberikan jawaban yang sangat panjang, dramatis, namun kejadiannya tidak pernah kakek Sinta alami. Fenomena ini dalam Kecerdasan Artifisial disebut...", o:["Voice Cloning","AI Hallucination (Halusinasi AI)","Cyber Security Breach","Garbage In, Garbage Out"], a:1, t:"Halusinasi & Keterbatasan AI", e:"AI generatif menyusun kata berdasarkan probabilitas, sehingga bisa menulis cerita yang meyakinkan padahal tidak benar. Fenomena ini disebut halusinasi AI. Selalu cek ulang fakta penting dari sumber terpercaya."},
+  {q:"Seorang siswa memasukkan nama lengkap, alamat rumah, nomor KTP orang tua, dan lokasi sekolah ke dalam Chatbot publik untuk dibuatkan surat izin sakit otomatis. Risiko keamanan terbesar dari tindakan siswa tersebut adalah...", o:["Chatbot akan rusak karena teks terlalu panjang","Data pribadi berpotensi tersimpan di peladen (server) AI dan bisa bocor / disalahgunakan","Siswa akan otomatis dikeluarkan dari sekolah","Kuota internet siswa akan terkuras habis"], a:1, t:"Keamanan Data Pribadi", e:"Data yang dimasukkan ke chatbot publik bisa tersimpan di server dan berisiko bocor atau disalahgunakan. Jangan pernah memasukkan NIK, alamat, atau nomor KTP ke chatbot."},
+  {q:"Dalam sistem penginderaan AI pada mobil otonom (bisa menyetir sendiri), kamera pada mobil merekam rambu lalu lintas. Bagaimana komputer pada mobil tersebut 'memaknai' gambar rambu merah itu?", o:["Sistem merasakannya sebagai cahaya panas","Sistem mengubah piksel gambar menjadi matriks angka matematis lalu mencocokkannya dengan pola data latih","Sistem melihat rambu lalu langsung menelepon polisi","Sistem akan menutup mata karena warnanya merah"], a:1, t:"Cara Kerja AI & Sensor", e:"Komputer tidak 'melihat' seperti manusia. Gambar dipecah menjadi piksel berupa angka (matriks), lalu dicocokkan dengan pola yang sudah dipelajari dari data latih."},
+  {q:"Prinsip 'Garbage In, Garbage Out' (GIGO) dalam AI memberikan pesan penting bagi programmer bahwa...", o:["Programmer harus rajin mengosongkan folder tempat sampah di komputer","Kecerdasan AI 100% bergantung pada akurasi dan objektivitas data yang diajarkan","AI tidak membutuhkan campur tangan manusia setelah diciptakan","Sebuah AI tidak bisa rusak meskipun datanya penuh virus"], a:1, t:"Bias Data & GIGO", e:"GIGO artinya kualitas keluaran AI mengikuti kualitas data masukan. Data yang buruk atau bias akan menghasilkan keputusan yang buruk atau bias."},
+  {q:"Pak Irwan menggunakan AI untuk menghasilkan gambar rapat dewan guru. Namun saat diperbesar, ada guru yang memiliki 7 jari tangan. Kesimpulan apa yang bisa diambil dari temuan artefak ini?", o:["AI tersebut meramalkan mutasi genetik di masa depan","Generative AI sering gagal memahami proporsi tubuh fisik manusia secara logis","Itu adalah foto asli, namun kameranya buram","Sistem komputer Pak Irwan terkena malware"], a:1, t:"Deepfake, Voice Cloning & Artefak KA", e:"Gambar buatan AI sering memiliki artefak, misalnya jari berlebih, karena AI meniru pola visual tanpa benar-benar memahami anatomi tubuh. Kejanggalan ini adalah petunjuk bahwa gambar bukan foto asli."},
+  {q:"Seseorang menelepon ibu Rina menggunakan nomor tidak dikenal. Suara di telepon itu sangat mirip 100% dengan suara anak Rina yang sedang menangis minta ditransfer uang. Jika Rina melek literasi AI, ia akan menyadari bahwa ini kemungkinan adalah serangan...", o:["Phishing email biasa","Voice Cloning menggunakan Kecerdasan Artifisial","Penipuan kartu kredit manual","Deepfake Video"], a:1, t:"Deepfake, Voice Cloning & Artefak KA", e:"Suara yang sangat mirip anggota keluarga dan mendesak transfer uang adalah modus Voice Cloning. Tetap tenang, tutup telepon, lalu hubungi langsung nomor asli keluargamu untuk memastikan."},
+  {q:"Mengapa kita TIDAK BOLEH mempercayakan pengambilan keputusan mutlak terkait hidup manusia (seperti vonis hukum di pengadilan) hanya kepada Kecerdasan Artifisial?", o:["Karena AI tidak punya empati dan mungkin menghasilkan putusan bias akibat data latihnya","Karena biaya listrik untuk menjalankan AI terlalu mahal bagi negara","Karena AI akan menghabiskan kertas putusan pengadilan","Karena AI lambat dalam mengetik surat keputusan"], a:0, t:"Etika & Dampak AI", e:"AI tidak punya empati dan nurani, serta bisa bias karena data latihnya. Keputusan yang menyangkut nasib manusia harus tetap dipegang dan dipertanggungjawabkan oleh manusia."},
+  {q:"Jika Anda ingin melatih sebuah AI untuk mendeteksi penyakit kulit secara adil pada semua ras manusia, jenis data latih (dataset) yang HARUS Anda kumpulkan adalah...", o:["Hanya foto penyakit dari rumah sakit di Eropa (orang kulit putih)","Foto-foto beresolusi rendah agar cepat diproses","Kumpulan foto penyakit kulit dari beragam ras, warna kulit, usia, dan jenis kelamin","Hanya teks teori medis dari buku kedokteran"], a:2, t:"Bias Data & GIGO", e:"Agar adil untuk semua orang, dataset harus beragam: berbagai ras, warna kulit, usia, dan jenis kelamin. Data yang timpang membuat AI hanya akurat untuk kelompok tertentu."},
+  {q:"Sistem pengenal wajah (Face Recognition) di pintu masuk MTsN 6 bertindak sebagai alat yang menggabungkan perangkat penginderaan (sensor) dengan AI. Perangkat penginderaan utamanya adalah...", o:["Mikrofon","Kamera (Sensor Optik)","Loudspeaker","Keyboard Mechanical"], a:1, t:"Cara Kerja AI & Sensor", e:"Kamera adalah sensor optik yang menangkap citra wajah. Citra itu kemudian dianalisis oleh AI untuk dikenali."},
+  {q:"Saat mengetik kalimat bahasa Indonesia menggunakan Google Assistant lewat suara, AI bertindak mengolah informasi suara menjadi teks (Speech to Text). Sensor utama yang menyuplai data ini bagi AI adalah...", o:["Mikrofon (Sensor Akustik)","Monitor Komputer","Lensa Kamera","Mouse Wireless"], a:0, t:"Cara Kerja AI & Sensor", e:"Suara ditangkap oleh mikrofon (sensor akustik), lalu AI mengubahnya menjadi teks (Speech to Text)."},
+  {q:"Etika penggunaan Kecerdasan Artifisial bagi seorang siswa dalam mengerjakan tugas esai dari guru adalah...", o:["Meminta AI menulis 100% esai dan mengklaimnya sebagai tulisan tangan sendiri","Menggunakan AI hanya sebagai alat bantu brainstorming ide, lalu menulis ulang dengan bahasa dan pemahaman sendiri","Menyuruh AI meretas komputer guru untuk memberikan nilai 100","Tidak menggunakan AI sama sekali agar tidak dimarahi komputer"], a:1, t:"Etika & Dampak AI", e:"AI boleh dipakai sebagai alat bantu mencari ide, tetapi tulisan akhir harus dari pemahamanmu sendiri. Mengaku karya AI sebagai karya sendiri melanggar kejujuran akademik."},
+  {q:"Andi mengunduh gambar pendaratan manusia di Mars hasil buatan Midjourney (AI Art). Ia mempublikasikannya di blognya dengan judul 'Foto Asli Mars dari NASA'. Tindakan Andi tersebut menunjukkan sikap...", o:["Kritis dan inovatif","Melanggar etika karena menyebarkan disinformasi (hoaks) menggunakan artefak AI","Hebat karena bisa menggunakan teknologi canggih","Sangat peduli pada pengetahuan luar angkasa"], a:1, t:"Etika & Dampak AI", e:"Menyebarkan gambar buatan AI sebagai 'foto asli NASA' adalah disinformasi (hoaks). Etika yang benar: beri keterangan jelas bahwa gambar tersebut buatan AI."},
+  {q:"Manakah dari aktivitas berikut yang merupakan dampak positif (manfaat) Kecerdasan Artifisial dalam kehidupan masyarakat?", o:["Mengurangi minat baca buku pelajaran fisik","Menganalisis hasil rontgen paru-paru pasien untuk mendeteksi gejala awal secara cepat","Membuat kloning wajah artis untuk iklan tanpa izin","Menghasilkan esai sekolah secara massal agar siswa tidak perlu berpikir"], a:1, t:"Etika & Dampak AI", e:"Membantu dokter mendeteksi gejala awal penyakit dari rontgen lebih cepat adalah manfaat nyata AI. Pilihan lainnya justru merugikan atau melanggar etika."},
+  {q:"Fitur 'Auto-Correct' pada keyboard smartphone sering kali salah menebak kata yang ingin kita ketik, khususnya kata gaul/daerah. Hal ini membuktikan bahwa...", o:["Kecerdasan buatan masih sangat mungkin menghasilkan output yang salah / kurang konteks","Smartphone tersebut rusak dan harus dibuang","AI memiliki sifat jahat untuk mengganggu manusia","AI lebih pintar dari bahasa manusia"], a:0, t:"Halusinasi & Keterbatasan AI", e:"AI belajar dari pola data. Kata gaul atau bahasa daerah yang jarang muncul di data latihnya mudah salah ditebak. Ini membuktikan AI belum sempurna dan sering kurang memahami konteks."},
+  {q:"Algoritma rekomendasi YouTube/TikTok adalah bentuk AI yang belajar dari kebiasaan menonton Anda. Jika Anda hanya sering menonton konten hoaks, maka AI tersebut akan...", o:["Otomatis menyaring konten hoaks karena ia peduli pada Anda","Menyarankan lebih banyak video hoaks serupa karena prinsip datanya bias","Menghapus akun Anda secara otomatis","Meminta izin orang tua Anda terlebih dahulu"], a:1, t:"Bias Data & GIGO", e:"Algoritma rekomendasi menyesuaikan diri dengan riwayat tontonanmu. Jika kamu sering menonton hoaks, AI akan menyodorkan lebih banyak yang serupa, karena AI tidak menilai benar atau salah, hanya mengikuti pola data."},
+  {q:"Perhatikan pernyataan ini: 'AI Generatif (seperti ChatGPT/Gemini) bukan sekadar mencari data di Google, melainkan menebak kata demi kata berdasarkan probabilitas matematis.'\nDari pernyataan tersebut, dapat disimpulkan bahwa AI Generatif...", o:["Tidak pernah salah dalam memberikan fakta","Bisa menyusun kalimat baru yang luwes, namun bisa saja merangkai kebohongan yang logis","Hanya bisa copy-paste dari Wikipedia","Mampu memahami emosi terdalam manusia"], a:1, t:"Halusinasi & Keterbatasan AI", e:"Karena menebak kata berdasarkan probabilitas, AI generatif bisa menulis kalimat yang luwes dan terdengar logis, tetapi tetap bisa keliru. Ia bukan sekadar copy-paste dan tidak benar-benar memahami emosi."},
+  {q:"Jika Anda sedang menganalisis keaslian sebuah video pidato tokoh (mencari ciri deepfake), Anda harus memperhatikan anomali (kejanggalan) pada...", o:["Jumlah jempol / like pada video tersebut","Bentuk bayangan wajah (lighting) dan gigi yang tampak blur atau aneh saat berbicara","Resolusi video yang disetel menjadi 1080p","Warna baju yang dipakai audiens di latar belakang"], a:1, t:"Deepfake, Voice Cloning & Artefak KA", e:"Pada video deepfake, pencahayaan wajah dan detail seperti gigi sering tampak janggal atau blur. Jumlah like, resolusi, dan baju penonton tidak berkaitan dengan keaslian video."},
+  {q:"Di sebuah sekolah, sistem AI digunakan untuk mengelompokkan minat bakat siswa. Jika ternyata hasil pengelompokan selalu keliru, tindakan perbaikan paling logis secara teknis adalah...", o:["Mengevaluasi dan memperbaiki KUALITAS DATA nilai dan survei siswa yang dimasukkan sebelumnya ke dalam AI","Menghancurkan komputer tersebut","Mengganti merk komputer","Menambahkan lebih banyak virus ke dalam sistem"], a:0, t:"Bias Data & GIGO", e:"Hasil yang selalu keliru biasanya berasal dari data yang bermasalah (prinsip GIGO). Solusi paling logis adalah memperbaiki kualitas datanya, bukan merusak atau mengganti komputer."},
+  {q:"Generative AI dapat merugikan seniman visual/pelukis jika...", o:["AI dipakai untuk mewarnai sketsa manual","AI dilatih (di-training) menggunakan miliaran karya seniman dari internet tanpa izin dan hak cipta (copyright)","AI mengajarkan teknik melukis baru","AI menghabiskan banyak listrik saat dinyalakan"], a:1, t:"Etika & Dampak AI", e:"Masalah muncul ketika AI dilatih dengan karya seniman tanpa izin, sehingga hak cipta dan hak ekonomi seniman terabaikan."},
+  {q:"Perbedaan utama cara Manusia dan Kecerdasan Artifisial (KA) dalam mengolah informasi adalah...", o:["Manusia menggunakan intuisi, moral, dan akal sehat, sedangkan KA murni mengkalkulasi pola data numerik tanpa emosi","Manusia lebih cepat dalam menghitung jutaan angka daripada KA","KA memiliki hati nurani, manusia tidak","KA tidak membutuhkan listrik untuk mengolah informasi"], a:0, t:"Peran Manusia & AI", e:"Manusia punya intuisi, moral, dan akal sehat. KA hanya menghitung pola data angka tanpa emosi. Dalam hal kecepatan menghitung, KA lebih unggul, bukan manusia."},
+  {q:"Mengapa penting bagi siswa kelas IX mempelajari cara mendeteksi 'Analisis Artefak Hasil KA'?", o:["Agar siswa bisa membuat virus komputer mutakhir","Sebagai bekal literasi digital agar kritis dan tidak mudah tertipu hoaks/manipulasi media di internet","Agar bisa mematikan komputer jarak jauh","Agar siswa menjadi robot"], a:1, t:"Literasi Digital & Zero Trust", e:"Mengenali artefak buatan KA melatih literasi digital: kamu jadi kritis dan tidak mudah tertipu hoaks atau manipulasi media di internet."},
+  {q:"Keamanan siber (Cybersecurity) di era AI mengharuskan kita memiliki prinsip 'Zero Trust', yang dalam konteks keseharian berarti...", o:["Tidak mempercayai satupun manusia di bumi","Menghindari segala bentuk investasi uang digital","Selalu bersikap skeptis dan verifikasi setiap informasi/file yang tampak meyakinkan di internet","Tidak menggunakan internet sama sekali"], a:2, t:"Literasi Digital & Zero Trust", e:"Zero Trust bukan berarti tidak percaya siapa pun, melainkan selalu skeptis dan memverifikasi informasi atau file yang tampak meyakinkan sebelum mempercayai atau menyebarkannya."},
+  {q:"Sikap akhir yang paling tepat mengenai hubungan Manusia dan AI adalah...", o:["Manusia harus tunduk pada keputusan efisien AI","AI adalah ancaman eksistensial yang harus dimusnahkan segera","AI adalah Alat Bantu (Tools); manusia tetap menjadi pemegang kendali dan tanggung jawab penuh","AI dan manusia harus bersaing memperebutkan wilayah geografis bumi"], a:2, t:"Peran Manusia & AI", e:"AI adalah alat bantu. Manusia tetap pemegang kendali dan bertanggung jawab penuh. Kita tidak tunduk pada AI, tetapi juga tidak perlu memusuhinya."}
 ];
 
 /* ---------------- UTILITAS ---------------- */
@@ -743,32 +759,74 @@ function konfirmasiKumpul(){
   } else kumpulkanFormatif();
 }
 
+function motivasiHTML({nilai=0,stat={},curang=false}={}){
+  const nm=esc((S.nama||'').trim().split(/\s+/)[0]||'Ananda');
+  if(curang){
+    return `<div class="motivasi curang"><h3>🌱 Pesan untuk ${nm}</h3>
+      <p>Ujian kali ini dibatalkan karena aturan pengawasan dilanggar. Tidak apa-apa, ini bukan akhir segalanya. Nilai yang jujur, sekecil apa pun, jauh lebih berharga daripada nilai tinggi yang diperoleh dengan cara yang tidak benar.</p>
+      <p>Hubungi gurumu, minta kesempatan lagi, dan siapkan diri dengan membaca ulang materi serta mengulang simulasi. Kamu pasti bisa! 💪</p></div>`;
+  }
+  let judul, isi;
+  if(nilai>=100){
+    judul=`🏆 Sempurna, ${nm}!`;
+    isi='Semua jawabanmu benar! Ini bukti kamu tidak sekadar menghafal, tetapi benar-benar paham cara kerja AI, bahaya deepfake, dan etika digital. Pertahankan semangat ini dan jadilah teman yang membantu orang lain bijak menggunakan AI.';
+  } else if(nilai>=90){
+    judul=`🌟 Luar biasa, ${nm}!`;
+    isi='Pemahamanmu sudah sangat kuat. Tinggal sedikit lagi menuju sempurna. Baca penjelasan pada soal yang masih keliru di bawah, lalu kamu siap menjadi pengguna AI yang kritis.';
+  } else if(nilai>=CONFIG.KKM){
+    judul=`👏 Hebat, ${nm}! Kamu tuntas!`;
+    isi='Kamu sudah memenuhi KKM dan itu hasil dari usahamu. Manfaatkan penjelasan di bawah untuk memperkuat bagian yang belum tepat, karena kesalahan adalah cara belajar yang paling efektif.';
+  } else {
+    judul=`💪 Tetap semangat, ${nm}!`;
+    isi='Terus belajar dan jangan menyerah. Baca kembali materi dan penjelasan jawaban, lalu coba lagi.';
+  }
+  const kuat=Object.keys(stat).filter(t=>stat[t].s===0);
+  const lemah=Object.keys(stat).filter(t=>stat[t].s>0);
+  const li=a=>a.map(t=>`<li>${esc(t)}</li>`).join('');
+  return `<div class="motivasi"><h3>${judul}</h3><p>${isi}</p>
+    <div class="mot-grid">
+      <div class="mot-col"><b>💪 Kekuatanmu</b>${kuat.length?`<ul>${li(kuat)}</ul>`:'Terus berlatih, kekuatanmu akan segera terlihat!'}</div>
+      <div class="mot-col"><b>🎯 Perlu diperkuat</b>${lemah.length?`<ul>${li(lemah)}</ul>`:'Tidak ada. Semua topik sudah kamu kuasai! 🎉'}</div>
+    </div>
+    <p class="mot-quote">AI hanyalah alat bantu, kamulah yang memegang kendali. Tetap kritis, tetap jujur, dan terus semangat belajar! 🚀</p></div>`;
+}
+
 function kumpulkanFormatif(){
   clearInterval(timerUjian);
   if(S.curang){
-    tampilRapor({nilai:0,lulus:false,curang:true,html:`<div class="feedback-item salah"><b>❌ Ujian dibatalkan:</b> ${esc(S.alasanCurang)}</div>`});
+    tampilRapor({nilai:0,lulus:false,curang:true,html:`<div class="feedback-item salah"><b>❌ Ujian dibatalkan:</b> ${esc(S.alasanCurang)}</div>`,motivasi:motivasiHTML({curang:true})});
     return;
   }
   let benar=0, html='';
+  const stat={};
   formatifData.forEach((it,i)=>{
     const ans=document.querySelector(`input[name="tf_${i}"]:checked`);
     const u=ans?parseInt(ans.value):-1;
-    if(u===it.a){ benar++; html+=`<div class="feedback-item benar"><b>Soal ${i+1}: ✔️ Benar</b></div>`; }
-    else {
-      html+=`<div class="feedback-item salah"><b>Soal ${i+1}: ❌ ${u<0?'Tidak dijawab':'Salah'}</b><br><span style="color:#555">Jawaban benar / konsep kunci: <i>${esc(it.o[it.a])}</i></span></div>`;
+    const tp=it.t||'Umum';
+    stat[tp]=stat[tp]||{b:0,s:0};
+    const penj=it.e?`<div class="penjelasan">💡 <b>Penjelasan:</b> ${esc(it.e)}</div>`:'';
+    const tag=`<div class="topik-tag">${esc(tp)}</div>`;
+    if(u===it.a){
+      benar++; stat[tp].b++;
+      html+=`<div class="feedback-item benar"><b>Soal ${i+1}: ✔️ Benar</b>${tag}${penj}</div>`;
+    } else {
+      stat[tp].s++;
+      html+=`<div class="feedback-item salah"><b>Soal ${i+1}: ❌ ${u<0?'Tidak dijawab':'Salah'}</b>${tag}`+
+        (u>=0?`<div class="jwb-siswa">Jawabanmu: <i>${esc(it.o[u])}</i></div>`:'')+
+        `<div class="jwb-benar">Jawaban benar: <i>${esc(it.o[it.a])}</i></div>${penj}</div>`;
     }
   });
   const nilai=Math.round(benar/formatifData.length*100);
 
   if(nilai<CONFIG.KKM){
-    showModal({icon:'💪',title:`Nilaimu ${nilai}`,body:`Belum mencapai KKM (${CONFIG.KKM}). Jangan menyerah! Kerjakan <b>remedial</b> dengan urutan opsi yang diacak ulang.`,ok:'Mulai Remedial',onOk:()=>mulaiUjian()});
+    showModal({icon:'💪',title:`Nilaimu ${nilai}`,body:`Belum mencapai KKM (${CONFIG.KKM}). Jangan menyerah, setiap percobaan membuatmu makin paham! Baca lagi materinya, lalu kerjakan <b>remedial</b> dengan urutan opsi yang diacak ulang.`,ok:'Mulai Remedial',onOk:()=>mulaiUjian()});
     return;
   }
   tambahXP(100);
-  tampilRapor({nilai,lulus:true,curang:false,html});
+  tampilRapor({nilai,lulus:true,curang:false,html,motivasi:motivasiHTML({nilai,stat})});
 }
 
-function tampilRapor({nilai,lulus,curang,html}){
+function tampilRapor({nilai,lulus,curang,html,motivasi=''}){
   clearInterval(timerMateri); clearInterval(timerUjian);
   showStep('step-formatif');
   $('lock-formatif').style.display='none';
@@ -783,6 +841,7 @@ function tampilRapor({nilai,lulus,curang,html}){
   const tgl=new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
   $('rapor-meta').innerHTML=`<span>⭐ ${S.xp} XP • ${levelName()}</span><span>🔁 Percobaan ke-${S.percobaan}</span><span>⚠ Pelanggaran: ${S.pelanggaran}</span><span>🗓 ${tgl}</span>`;
   $('feedback-container').innerHTML=html;
+  $('motivasi-box').innerHTML=motivasi;
   S.aktif=false;
   const st=$('floating-cam').srcObject;
   if(st) st.getTracks().forEach(t=>t.stop());
