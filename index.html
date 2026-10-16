@@ -181,6 +181,11 @@ h2.title{margin:0 0 6px;font-size:1.35rem;font-weight:700}
 #modal .body{font-size:.92rem;color:#475569}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:3000}
 
+/* ---------- ANTI SCREENSHOT ---------- */
+#wm{position:fixed;inset:0;z-index:1500;pointer-events:none;display:none;background-repeat:repeat}
+body.shield .container{filter:blur(22px);transition:filter .05s}
+body.shield .container *{pointer-events:none}
+@media print{#wm{display:none!important}}
 /* ---------- PRINT ---------- */
 @media print{
   body{background:#fff;-webkit-user-select:auto;user-select:auto}
@@ -210,6 +215,7 @@ h2.title{margin:0 0 6px;font-size:1.35rem;font-weight:700}
 <video id="floating-cam" autoplay playsinline muted></video>
 <div id="cam-label">● PENGAWASAN</div>
 <canvas id="confetti"></canvas>
+<div id="wm"></div>
 
 <div id="modal"><div class="box">
   <div class="ic" id="m-ic"></div><h3 id="m-title"></h3><div class="body" id="m-body"></div>
@@ -245,7 +251,7 @@ h2.title{margin:0 0 6px;font-size:1.35rem;font-weight:700}
         <ol>
           <li>Wajib membaca materi selama <b>30 menit</b>. Waktu hanya berjalan saat halaman ini terbuka.</li>
           <li>Wajib menjawab seluruh kuis materi dan mencoba <b>seluruh simulasi</b> sebelum Ujian Akhir.</li>
-          <li><b>Pengawasan aktif:</b> dilarang membuka aplikasi/tab lain. Setiap pelanggaran dicatat. Pada ujian, <b>3 kali pelanggaran = ujian dibatalkan</b>.</li>
+          <li><b>Pengawasan aktif:</b> dilarang membuka aplikasi/tab lain. Setiap pelanggaran dicatat. <b>3 kali meninggalkan halaman = nilai langsung 0</b> dan sesi dihentikan.</li>
           <li>Dilarang menyalin (copy-paste) soal ke AI lain. Jika terdeteksi, nilai otomatis 0.</li>
           <li><b>KKM 75.</b> Nilai di bawah 75 wajib <b>remedial</b> sampai tuntas untuk melihat rapor.</li>
         </ol>
@@ -433,6 +439,8 @@ const CONFIG = {
   WAKTU_MATERI: 1800,   // detik
   WAKTU_UJIAN: 1800,    // detik
   KKM: 75,
+  ANTI_SCREENSHOT: true, // watermark nama siswa + blur saat jendela kehilangan fokus + deteksi tombol PrintScreen
+  NILAI_NOL_SELURUH_SESI: true, // true = 3x keluar halaman di tahap mana pun (materi/simulasi/ujian) langsung nilai 0; false = hanya saat ujian
   MAX_PELANGGARAN: 3,   // batas pindah tab saat ujian
   SCRIPT_URL: ""        // opsional: URL Google Apps Script untuk merekap nilai ke Google Sheets
 };
@@ -590,6 +598,7 @@ function mulaiApersepsi(){
   $('student-info').textContent=`👤 ${S.nama} • Kelas ${S.kelas}`;
   $('hud').style.display='block';
   S.aktif=true;
+  pasangWatermark();
   renderDiag();
   showStep('step-apersepsi');
 }
@@ -759,6 +768,9 @@ function kumpulkanFormatif(){
 }
 
 function tampilRapor({nilai,lulus,curang,html}){
+  clearInterval(timerMateri); clearInterval(timerUjian);
+  showStep('step-formatif');
+  $('lock-formatif').style.display='none';
   $('konten-formatif').style.display='none';
   $('hasil-akhir').style.display='block';
   $('cetak-nama').textContent=`${S.nama} • Kelas ${S.kelas}`;
@@ -796,10 +808,18 @@ document.addEventListener('visibilitychange',()=>{
       S.curang=true; S.alasanCurang=`keluar dari halaman ujian sebanyak ${S.pelanggaran} kali.`;
       showModal({icon:'🚨',title:'Ujian Dibatalkan',body:`Kamu telah keluar dari halaman ujian ${S.pelanggaran} kali. Nilai otomatis 0.`,onOk:kumpulkanFormatif});
     } else {
-      showModal({icon:'🚨',title:'Pelanggaran Terdeteksi',body:`Kamu keluar dari halaman ujian. Pelanggaran <b>${S.pelanggaran} dari ${CONFIG.MAX_PELANGGARAN}</b>. Jika mencapai batas, ujian dibatalkan.`,ok:'Saya Mengerti'});
+      showModal({icon:'🚨',title:'Pelanggaran Terdeteksi',body:`Kamu keluar dari halaman ujian. Pelanggaran <b>${S.pelanggaran} dari ${CONFIG.MAX_PELANGGARAN}</b>. ${S.pelanggaran===CONFIG.MAX_PELANGGARAN-1?'<b style="color:#b91c1c">PERINGATAN TERAKHIR!</b> Sekali lagi keluar, nilaimu langsung 0.':'Jika mencapai batas, nilaimu langsung 0.'}`,ok:'Saya Mengerti'});
     }
   } else {
-    showModal({icon:'⚠️',title:'Pelanggaran Tercatat',body:'Sistem mencatat kamu meninggalkan halaman. Tetap fokus di halaman ini. Waktu baca tidak berjalan saat kamu keluar.',ok:'Kembali Belajar'});
+    if(CONFIG.NILAI_NOL_SELURUH_SESI && S.pelanggaran>=CONFIG.MAX_PELANGGARAN){
+      S.curang=true; S.alasanCurang=`meninggalkan halaman sebanyak ${S.pelanggaran} kali selama sesi PJJ.`;
+      showModal({icon:'🚨',title:'Sesi Dihentikan',body:`Kamu telah meninggalkan halaman ${S.pelanggaran} kali. Sesuai tata tertib, nilai otomatis <b>0</b>.`,onOk:kumpulkanFormatif});
+    } else if(CONFIG.NILAI_NOL_SELURUH_SESI){
+      const sisa=CONFIG.MAX_PELANGGARAN-S.pelanggaran;
+      showModal({icon:'⚠️',title:`Pelanggaran ${S.pelanggaran} dari ${CONFIG.MAX_PELANGGARAN}`,body:`Kamu meninggalkan halaman. ${sisa===1?'<b style="color:#b91c1c">PERINGATAN TERAKHIR!</b> Sekali lagi keluar, nilaimu langsung 0.':`Sisa kesempatan: <b>${sisa}</b>. Pada pelanggaran ke-${CONFIG.MAX_PELANGGARAN}, nilaimu langsung 0.`} Waktu baca tidak berjalan saat kamu keluar.`,ok:'Kembali Belajar'});
+    } else {
+      showModal({icon:'⚠️',title:'Pelanggaran Tercatat',body:'Sistem mencatat kamu meninggalkan halaman. Tetap fokus di halaman ini. Waktu baca tidak berjalan saat kamu keluar.',ok:'Kembali Belajar'});
+    }
   }
 });
 
@@ -823,6 +843,48 @@ document.addEventListener('keydown',e=>{
   }
 });
 document.addEventListener('dragstart',e=>e.preventDefault());
+
+/* ---------------- ANTI SCREENSHOT (penghalang, bukan pemblokir mutlak) ---------------- */
+function pasangWatermark(){
+  if(!CONFIG.ANTI_SCREENSHOT) return;
+  const t=`${S.nama} • ${S.kelas} • ${new Date().toLocaleString('id-ID')}`;
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='380' height='230'><text x='20' y='150' transform='rotate(-25 20 150)' font-family='Arial,sans-serif' font-size='15' font-weight='700' fill='rgba(79,70,229,0.14)'>${esc(t)}</text></svg>`;
+  $('wm').style.backgroundImage=`url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+  $('wm').style.display='block';
+}
+function pelanggaranUjian(pesan){
+  S.pelanggaran++; updatePelanggaranInfo();
+  if(S.pelanggaran>=CONFIG.MAX_PELANGGARAN){
+    S.curang=true; S.alasanCurang=pesan+' (batas pelanggaran tercapai).';
+    showModal({icon:'🚨',title:'Ujian Dibatalkan',body:`${pesan}. Pelanggaran mencapai ${S.pelanggaran}. Nilai otomatis 0.`,onOk:kumpulkanFormatif});
+  } else {
+    showModal({icon:'📵',title:'Pelanggaran Terdeteksi',body:`${pesan}. Pelanggaran <b>${S.pelanggaran} dari ${CONFIG.MAX_PELANGGARAN}</b>.`,ok:'Saya Mengerti'});
+  }
+}
+function lindungiLayar(ms){
+  document.body.classList.add('shield');
+  setTimeout(()=>{ if(document.hasFocus()) document.body.classList.remove('shield'); },ms);
+}
+if(CONFIG.ANTI_SCREENSHOT){
+  // Jendela kehilangan fokus (snipping tool, split screen, overlay) -> konten dikaburkan selama ujian/belajar
+  window.addEventListener('blur',()=>{ if(S.aktif) document.body.classList.add('shield'); });
+  window.addEventListener('focus',()=>document.body.classList.remove('shield'));
+  // Tombol PrintScreen (Windows/Linux): kosongkan clipboard + kaburkan sesaat
+  document.addEventListener('keyup',e=>{
+    if(e.key==='PrintScreen' && S.aktif){
+      try{ navigator.clipboard.writeText(' '); }catch(_){}
+      lindungiLayar(1500);
+      if(dalamUjian()) pelanggaranUjian('Terdeteksi menekan tombol PrintScreen');
+    }
+  });
+  document.addEventListener('keydown',e=>{
+    // Win+Shift+S, Cmd+Shift+3/4/5
+    if(S.aktif && ((e.shiftKey&&e.metaKey&&['s','3','4','5'].includes((e.key||'').toLowerCase())))){
+      e.preventDefault(); lindungiLayar(1500);
+      if(dalamUjian()) pelanggaranUjian('Terdeteksi pintasan screenshot');
+    }
+  });
+}
 
 window.addEventListener('beforeunload',e=>{ if(S.aktif){ e.preventDefault(); e.returnValue=''; } });
 </script>
