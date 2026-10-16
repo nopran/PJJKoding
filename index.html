@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PJJ Informatika Kelas IX - MTsN 6 Pesisir Selatan</title>
+<title>PJJ Koding dan KA Kelas IX - MTsN 6 Pesisir Selatan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -208,7 +208,7 @@ body.shield .container *{pointer-events:none}
 
 <header>
   <span class="badge-ai">🤖 KECERDASAN ARTIFISIAL</span>
-  <h1>PJJ Informatika Kelas IX</h1>
+  <h1>PJJ Koding dan KA Kelas IX</h1>
   <p>MTsN 6 Pesisir Selatan • Belajar Cerdas, Jujur, dan Kritis</p>
 </header>
 
@@ -247,7 +247,7 @@ body.shield .container *{pointer-events:none}
       <p class="sub">Baca tata tertib, aktifkan kamera, lalu isi data dirimu.</p>
 
       <div class="rules">
-        <h3>⚠️ Tata Tertib PJJ Informatika</h3>
+        <h3>⚠️ Tata Tertib PJJ Koding dan KA</h3>
         <ol>
           <li>Wajib membaca materi selama <b>30 menit</b>. Waktu hanya berjalan saat halaman ini terbuka.</li>
           <li>Wajib menjawab seluruh kuis materi dan mencoba <b>seluruh simulasi</b> sebelum Ujian Akhir.</li>
@@ -412,7 +412,7 @@ body.shield .container *{pointer-events:none}
 
       <div id="hasil-akhir" style="display:none">
         <div class="rapor" id="rapor-box">
-          <h2 id="rapor-judul">🎓 Rapor PJJ Informatika</h2>
+          <h2 id="rapor-judul">🎓 Rapor PJJ Koding dan KA</h2>
           <h3 id="cetak-nama" style="margin:8px 0"></h3>
           <div class="nilai" id="teks-nilai"></div>
           <div id="rapor-status" style="font-weight:700"></div>
@@ -777,7 +777,7 @@ function tampilRapor({nilai,lulus,curang,html}){
   const box=$('rapor-box'), nl=$('teks-nilai');
   box.classList.toggle('fail',!lulus);
   nl.textContent=nilai; nl.style.color=lulus?'#047857':'#b91c1c';
-  $('rapor-judul').textContent=lulus?'🎓 Rapor Lulus PJJ Informatika':'🚫 Ujian Dibatalkan';
+  $('rapor-judul').textContent=lulus?'🎓 Rapor Lulus PJJ Koding dan KA':'🚫 Ujian Dibatalkan';
   $('rapor-status').textContent=lulus?`Status: TUNTAS (memenuhi KKM ${CONFIG.KKM})`:'Status: TIDAK TUNTAS - hubungi guru mapel';
   const tgl=new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
   $('rapor-meta').innerHTML=`<span>⭐ ${S.xp} XP • ${levelName()}</span><span>🔁 Percobaan ke-${S.percobaan}</span><span>⚠ Pelanggaran: ${S.pelanggaran}</span><span>🗓 ${tgl}</span>`;
